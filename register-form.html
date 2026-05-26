@@ -217,13 +217,14 @@
 
     <div class="consent-box">
       <h3>📱 SMS Consent</h3>
-      <p>You'll receive court invite links by text when a spot opens up for you — typically once per week on booking nights.</p>
-      <p>Your contact info is used exclusively for HKPC court invites and will never be shared or sold to third parties.</p>
+      <p>By registering, you agree to receive SMS messages from HKPC with court invite links when a spot is available for you. Message frequency varies — typically once per week on booking nights.</p>
+      <p>Message and data rates may apply. Reply <strong style="color:#4ade80">STOP</strong> at any time to opt out. Reply <strong style="color:#4ade80">HELP</strong> for help.</p>
+      <p>Your contact info is used exclusively for HKPC court invites and will never be shared or sold to third parties or affiliates for marketing purposes. No mobile data will be shared with third parties.</p>
     </div>
 
     <div class="agree-row">
       <input type="checkbox" id="agree">
-      <label for="agree">By checking this box, I agree to receive informational text messages from HKPC Renegade. Consent is not a condition of purchase. Message frequency will vary. Msg &amp; data rates may apply. Reply STOP to opt out. Reply HELP for help.</label>
+      <label for="agree">I agree to receive SMS court invite messages from HKPC. I understand I can reply STOP at any time to opt out.</label>
     </div>
 
     <button id="submitBtn" disabled onclick="submitRegistration()">Register for Court Invites</button>
@@ -238,7 +239,7 @@
 <script>
   // ── Config ────────────────────────────────────────────────────────────────
   // IMPORTANT: Replace with your deployed apps-script-invite.js URL
-  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzbDNaskbL_oweJFuP2NZwjG-TzZF_Knw-fV1GmXw-YzYgTvYPkuvwbLsrtqVh4JKngHQ/exec';
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwyB57KwCbgWs-hyCIkupzwY2wRdCJDR87qR6PeVgKPZYjtl5E6J-4MdE1x2B7anGRDAg/exec';
 
   // ── Form validation ───────────────────────────────────────────────────────
   const fieldIds  = ['name', 'email', 'phone'];

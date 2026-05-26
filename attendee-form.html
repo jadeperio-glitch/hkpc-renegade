@@ -109,9 +109,8 @@
     .email-row button:hover { background: #236008; }
     .email-row button:disabled { background: #9CA3AF; cursor: not-allowed; }
     .email-hint {
-      font-size: 12px;
-      color: #6B7280;
-      line-height: 1.5;
+      font-size: 11px;
+      color: #9CA3AF;
       margin-top: 8px;
     }
 
@@ -298,14 +297,13 @@
 <script>
   // ── Config ────────────────────────────────────────────────────────────────
   // IMPORTANT: Replace with your deployed apps-script-invite.js URL
-  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzbDNaskbL_oweJFuP2NZwjG-TzZF_Knw-fV1GmXw-YzYgTvYPkuvwbLsrtqVh4JKngHQ/exec';
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwyB57KwCbgWs-hyCIkupzwY2wRdCJDR87qR6PeVgKPZYjtl5E6J-4MdE1x2B7anGRDAg/exec';
 
   // ── State ─────────────────────────────────────────────────────────────────
   let session          = null;
   let attendeeEmail    = null;
   let confirmedEventId = null;
-  let selectedDate     = null;
-  let smsConsented     = false;  // must check consent box before confirming
+  let selectedDate     = null;  // which night's courts are shown
 
   // ── Toast ─────────────────────────────────────────────────────────────────
   function showToast(msg, duration = 3000) {
@@ -322,12 +320,6 @@
       const data = await res.json();
       if (!data.success) throw new Error(data.error || 'Could not load session');
       session = data.session;
-      // Handle empty session (no active bookings)
-      if (!session.courts || session.courts.length === 0) {
-        document.getElementById('app').innerHTML =
-          `<div class="loading-state">🥒 No courts booked yet — check back soon!</div>`;
-        return;
-      }
       render();
     } catch (err) {
       document.getElementById('app').innerHTML =
@@ -340,12 +332,6 @@
     if (!dateStr) return 'TBD';
     const [y, m, d] = dateStr.split('-').map(Number);
     return new Date(y, m-1, d).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-  }
-
-  // ── Toggle SMS consent checkbox ──────────────────────────────────────────
-  function toggleConsent(checked) {
-    smsConsented = checked;
-    render();
   }
 
   // ── Select a date tab ────────────────────────────────────────────────────
@@ -394,7 +380,7 @@
           <input type="email" id="emailInput" placeholder="your@email.com" autocomplete="email">
           <button id="emailBtn" onclick="submitEmail()">Go</button>
         </div>
-        <div class="email-hint">Use the email you registered with HKPC. Upon confirmation, you will receive an SMS or email with the PodPlay reservation. Click through to finalize booking your spot.</div>
+        <div class="email-hint">Use the email you registered with HKPC.</div>
       </div>
 
       <div class="courts">
@@ -433,13 +419,9 @@
       } else if (isFull) {
         actionHtml = `<button class="confirm-btn" disabled>Court Full</button>`;
       } else {
-        const disabled = !attendeeEmail || !smsConsented || confirmedEventId ? 'disabled' : '';
-        const btnText  = !attendeeEmail ? 'Enter your email above first'
-                       : !smsConsented  ? 'Check the consent box below first'
-                       : confirmedEventId ? 'Already confirmed'
-                       : 'Confirm My Spot';
+        const disabled = !attendeeEmail || confirmedEventId ? 'disabled' : '';
         actionHtml = `<button class="confirm-btn" ${disabled} onclick="confirmSpot('${court.eventId}', this)">
-          ${btnText}
+          ${!attendeeEmail ? 'Enter your email above first' : confirmedEventId ? 'Already confirmed' : 'Confirm My Spot'}
         </button>`;
       }
 
@@ -463,18 +445,13 @@
 
     html += `</div>`;
 
-    // Consent checkbox — required before any court can be confirmed
+    // Consent / SMS disclaimer
     html += `
       <div class="consent">
         <h3>📱 SMS Notifications</h3>
-        <p>You will receive a one-time SMS with your court invite link after confirming a spot. Your contact info is never shared or sold to third parties. Not affiliated with PodPlay Technologies or Hell's Kitchen Pickleball Club.</p>
-        <div style="display:flex; align-items:flex-start; gap:10px; margin-top:14px;">
-          <input type="checkbox" id="smsConsentBox" ${smsConsented ? 'checked' : ''} onchange="toggleConsent(this.checked)"
-            style="width:16px; height:16px; margin-top:2px; flex-shrink:0; accent-color:#2D7D0A; cursor:pointer;">
-          <label for="smsConsentBox" style="font-size:12.5px; color:#374151; line-height:1.55; cursor:pointer;">
-            By checking this box, I agree to receive informational text messages from HKPC Renegade. Consent is not a condition of purchase. Message frequency will vary. Msg &amp; data rates may apply. Reply STOP to opt out. Reply HELP for help.
-          </label>
-        </div>
+        <p>By confirming a spot, you agree to receive a one-time SMS from HKPC Renegade with your court invite link. Message frequency: 1 message per court you confirm. Msg &amp; data rates may apply.</p>
+        <p>Reply <strong>STOP</strong> to opt out at any time. Reply <strong>HELP</strong> for help. This is a private booking tool used by a small group of friends. Not affiliated with PodPlay Technologies or Hell's Kitchen Pickleball Club.</p>
+        <p>Your contact information is used exclusively to send court invites and will never be shared or sold to third parties.</p>
       </div>
     `;
 
